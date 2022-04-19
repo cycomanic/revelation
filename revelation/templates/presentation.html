@@ -19,7 +19,9 @@
     {% endif %}
 
     {% if style %}
-      <link rel="stylesheet" href="{{ style }}" id="style">
+        {% for st in style %}
+            <link rel="stylesheet" href="{{ st }}" id="style">
+        {% endfor %}
     {% endif %}
 
     <!-- Theme used for syntax highlighted code -->

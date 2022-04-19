@@ -56,7 +56,9 @@ class Revelation(object):
         shared_data.update(self.parse_shared_data(self.static))
         shared_data.update(self.parse_shared_data(self.media))
         shared_data.update(self.parse_shared_data(self.theme))
-        shared_data.update(self.parse_shared_data(self.style))
+        shared_data.update(self.parse_shared_data(self.scripts))
+        for st in self.style:
+            shared_data.update(self.parse_shared_data(st))
 
         self.wsgi_app = SharedDataMiddleware(self._wsgi_app, shared_data)
 
@@ -120,7 +122,7 @@ class Revelation(object):
             "config": self.config.get("REVEAL_CONFIG"),
             "scripts": self.config.get("REVEAL_EXTRA_SCRIPTS"),
             "theme": self.get_theme(str(self.config.get("REVEAL_THEME"))),
-            "style": getattr(self.style, "name", None),
+            "style": [getattr(st, "name", None) for st in self.style],
             "plugins": self.config.get("REVEAL_PLUGINS"),
         }
 

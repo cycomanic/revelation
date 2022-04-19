@@ -49,10 +49,12 @@ def revelation_factory(
 
         raise typer.Abort()
 
-    if style and (not style.is_file() or not style.suffix == ".css"):
-        error("Style is not a css file or does not exists.")
-
-        raise typer.Abort()
+    if style:
+        print(style)
+        for st in style:
+            if (not st.is_file() or not st.suffix == ".css"):
+                error("Style is not a css file or does not exists.")
+                raise typer.Abort()
 
     if not media:
         media = path / "media"
@@ -172,7 +174,7 @@ def mkstatic(
         "-r",
         help="Overwrite the output folder if exists",
     ),
-    style: Optional[Path] = Option(
+    style: Optional[list[Path]] = Option(
         None,
         "--style-override-file",
         "-s",
@@ -221,7 +223,8 @@ def mkstatic(
     output_folder.mkdir(parents=True, exist_ok=True)
 
     if app.style:
-        shutil.copy(app.style, output_folder / app.style.name)
+        for st in app.style:
+            shutil.copy(st, output_folder / st.name)
 
     shutil.copytree(REVEALJS_DIR, staticfolder / "revealjs")
 
@@ -264,7 +267,7 @@ def start(
     scripts: Optional[Path] = Option(
         None, "--scripts", "-r", help="Custom javascript plugin folder"
     ),
-    style: Optional[Path] = Option(
+    style: Optional[list[Path]] = Option(
         None,
         "--style-override-file",
         "-s",
