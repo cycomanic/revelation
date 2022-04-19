@@ -29,6 +29,8 @@ class Revelation(object):
     theme: Optional[Path]
     style: Optional[Path]
     static: Path = Path(__file__).parent.resolve() / "static"
+    scripts: Optional[Path]
+    update: Optional[bool]
 
     def __init__(
         self,
@@ -37,15 +39,18 @@ class Revelation(object):
         media: Optional[Path] = None,
         theme: Optional[Path] = None,
         style: Optional[Path] = None,
+        scripts: Optional[Path] = None,
+        update: Optional[bool] = False,
     ):
         """
         Initializes the server and creates the environment for the presentation
         """
         self.presentation = presentation
-        self.config = Config(config)
+        self.config = Config(config, update)
         self.media = media
         self.theme = theme
         self.style = style
+        self.scripts = scripts
 
         shared_data = dict()
         shared_data.update(self.parse_shared_data(self.static))
@@ -104,6 +109,7 @@ class Revelation(object):
             autoescape=select_autoescape(["html"]),
         )
 
+        print(self.config.get("REVEAL_EXTRA_SCRIPTS"))
         context = {
             "meta": self.config.get("REVEAL_META"),
             "slides": self.load_slides(
@@ -112,8 +118,10 @@ class Revelation(object):
                 str(self.config.get("REVEAL_VERTICAL_SLIDE_SEPARATOR")),
             ),
             "config": self.config.get("REVEAL_CONFIG"),
+            "scripts": self.config.get("REVEAL_EXTRA_SCRIPTS"),
             "theme": self.get_theme(str(self.config.get("REVEAL_THEME"))),
             "style": getattr(self.style, "name", None),
+            "plugins": self.config.get("REVEAL_PLUGINS"),
         }
 
         template = env.get_template("presentation.html")

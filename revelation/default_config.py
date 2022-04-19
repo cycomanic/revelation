@@ -23,6 +23,13 @@ REVEAL_VERTICAL_SLIDE_SEPARATOR = "---~"
 # solarized, white
 REVEAL_THEME = "black"
 
+REVEAL_PLUGINS = ["RevealMarkdown",
+                   "RevealHighlight",
+                   "RevealSearch",
+                   "RevealNotes",
+                   "RevealMath",
+                   "RevealZoom"]
+
 REVEAL_CONFIG = {
     # Display presentation control arrows
     "controls": True,

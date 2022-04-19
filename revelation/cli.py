@@ -39,6 +39,8 @@ def revelation_factory(
     media: Optional[Path] = None,
     theme: Optional[Path] = None,
     style: Optional[Path] = None,
+    scripts: Optional[Path] = None,
+    update: Optional[bool] = True,
 ) -> Revelation:
     if presentation.is_file():
         path = presentation.parent
@@ -76,7 +78,14 @@ def revelation_factory(
 
         echo("Configuration file not detected, running with defaults.")
 
-    return Revelation(presentation, config, media, theme, style)
+    if not scripts:
+        scripts = path / "scripts"
+
+    if not scripts.is_dir():
+        scripts = None
+        echo("No extra scripts/plugins detected")
+
+    return Revelation(presentation, config, media, theme, style, scripts, update)
 
 
 @cli.command()
@@ -142,6 +151,9 @@ def mkstatic(
     theme: Optional[Path] = Option(
         None, "--theme", "-t", help="Custom theme folder"
     ),
+    scripts: Optional[Path] = Option(
+        None, "--scripts", "-r", help="Directory with extra javascript plugins"
+    ),
     output_folder: Path = Option(
         Path("output"),
         "--output-folder",
@@ -166,6 +178,13 @@ def mkstatic(
         "-s",
         help="Custom css file to override reveal.js styles",
     ),
+    update: Optional[bool] = Option(
+        False,
+        "--update",
+        "-u",
+        help="Update or overwrite default config"
+    ),
+
 ):
     """Make static presentation"""
 
@@ -193,7 +212,7 @@ def mkstatic(
 
         raise typer.Abort()
 
-    app = revelation_factory(presentation, config, media, theme, style)
+    app = revelation_factory(presentation, config, media, theme, style, scripts, update)
 
     echo("Generating static presentation...")
 
@@ -211,6 +230,9 @@ def mkstatic(
 
     if app.theme:
         shutil.copytree(app.theme, output_folder / "theme")
+
+    if app.scripts:
+        shutil.copytree(app.scripts, output_folder / app.scripts)
 
     output_folder = output_folder.resolve()
 
@@ -239,6 +261,9 @@ def start(
     theme: Optional[Path] = Option(
         None, "--theme", "-t", help="Custom theme folder"
     ),
+    scripts: Optional[Path] = Option(
+        None, "--scripts", "-r", help="Custom javascript plugin folder"
+    ),
     style: Optional[Path] = Option(
         None,
         "--style-override-file",
@@ -252,6 +277,12 @@ def start(
         is_flag=True,
         help="Run the revelation server on debug mode",
     ),
+    update: Optional[bool] = Option(
+        False,
+        "--update",
+        "-u",
+        help="Update or overwrite default config"
+    ),
 ):
     """Start the revelation server"""
 
@@ -263,7 +294,7 @@ def start(
             get_command(cli).get_command(ctx, "installreveal")  # type: ignore
         )
 
-    app = revelation_factory(presentation, config, media, theme, style)
+    app = revelation_factory(presentation, config, media, theme, style, scripts, update)
 
     presentation_root = presentation.parent
 

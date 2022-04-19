@@ -67,24 +67,21 @@
     <script src="static/revealjs/plugin/notes/notes.js"></script>
     <script src="static/revealjs/plugin/math/math.js"></script>
     <script src="static/revealjs/plugin/zoom/zoom.js"></script>
+{% for script in scripts %}
+    <script src="{{ script }}"></script>
+{% endfor %}
 
     <script>
-      Reveal.initialize({
+    var defaultOptions = {
         math: {
           mathjax: 'static/mathjax/MathJax.js',
           config: 'TeX-AMS_HTML-full',
           // pass other options into `MathJax.Hub.Config()`
           TeX: { Macros: { RR: "{\\bf R}" } }
         },
-        plugins: [
-          RevealMarkdown,
-          RevealHighlight,
-          RevealSearch,
-          RevealNotes,
-          RevealMath,
-          RevealZoom
-        ]
-      });
+        plugins: [ {%for plugin in plugins %} {{ plugin }}, {% endfor %}]      };
+
+      Reveal.initialize(defaultOptions);
 
       Reveal.configure({{ config|tojson }});
     </script>

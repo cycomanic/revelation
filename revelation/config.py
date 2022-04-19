@@ -17,22 +17,28 @@ class Config(dict):
     loads the external configs
     """
 
-    def __init__(self, filename: Optional[Path] = None):
+    def __init__(self, filename: Optional[Path] = None, update: Optional[bool] = True):
         """Initializes the config with the defaults or with custom
         variables from an external file"""
-        self.load_from_object(default_config)
+        self.load_from_object(default_config, update=False)
 
         if filename and filename.is_file():
-            self.load_from_pyfile(filename)
+            self.load_from_pyfile(filename, update)
 
-    def load_from_object(self, obj: ModuleType):
+    def load_from_object(self, obj: ModuleType, update: Optional[bool] = True):
         """Load the configs from a python object passed
         to the function"""
         for key in dir(obj):
             if key.isupper():
-                self[key] = getattr(obj, key)
+                if update and key in self:
+                    try:
+                        self[key].update(getattr(obj, key))
+                    except AttributeError:
+                        self[key] = getattr(obj, key)
+                else:
+                    self[key] = getattr(obj, key)
 
-    def load_from_pyfile(self, filename: Path):
+    def load_from_pyfile(self, filename: Path, update:Optional[bool] = True):
         """Load the configs from a python file as it was imported"""
         module = ModuleType("config")
         module.__file__ = str(filename)
@@ -46,4 +52,4 @@ class Config(dict):
 
             raise error
 
-        self.load_from_object(module)
+        self.load_from_object(module, update)
