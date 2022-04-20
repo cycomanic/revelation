@@ -50,7 +50,6 @@ def revelation_factory(
         raise typer.Abort()
 
     if style:
-        print(style)
         for st in style:
             if (not st.is_file() or not st.suffix == ".css"):
                 error("Style is not a css file or does not exists.")
@@ -229,7 +228,7 @@ def mkstatic(
     shutil.copytree(REVEALJS_DIR, staticfolder / "revealjs")
 
     if app.media:
-        shutil.copytree(app.media, output_folder / "media")
+        shutil.copytree(app.media, output_folder / shutil.os.path.basename(app.media))
 
     if app.theme:
         shutil.copytree(app.theme, output_folder / "theme")
