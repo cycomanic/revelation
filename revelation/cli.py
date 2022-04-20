@@ -226,6 +226,7 @@ def mkstatic(
             shutil.copy(st, output_folder / st.name)
 
     shutil.copytree(REVEALJS_DIR, staticfolder / "revealjs")
+    shutil.copytree(MATHJAX_DIR, staticfolder / "mathjax")
 
     if app.media:
         shutil.copytree(app.media, output_folder / shutil.os.path.basename(app.media))
